@@ -6,11 +6,12 @@ keywords:
 - meeting note
 - agenda
 - action items
+- smaas
 - Burstable MLaaS
 tags: '[template, meeting]'
 category: template
 classification: 🟢🛡️ General
-last_updated: '2026-10-11'
+last_updated: '2026-10-23'
 author: thatsafact
 ai_search_aliases:
 - meeting note template
@@ -23,7 +24,7 @@ attendees: ''
 # Meeting — {{date}}
 
 > **TL;DR:** Standard Obsidian/Markdown template for capturing project meeting agendas, notes, action items, and SOW links.
-> **Use this for:** Creating new meeting notes in the Projects/Burstable MLaaS/Meetings/ directory.
+> **Use this for:** Creating new meeting notes in the Projects/smaas/Meetings/ directory.
 
 ## Agenda
 -

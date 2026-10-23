@@ -11,7 +11,7 @@ tags:
 - template
 category: template
 classification: 🟢🛡️ General
-last_updated: '2026-10-11'
+last_updated: '2026-10-23'
 author: thatsafact
 ai_search_aliases:
 - weekly status template
@@ -22,7 +22,7 @@ ai_search_aliases:
 # Weekly Status — {{date}}
 
 > **TL;DR:** Standard template for submitting weekly project status reports, tracking task progress, blockers, upcoming work, and resource hours.
-> **Use this for:** Filing new weekly status updates in Projects/Burstable MLaaS/Status Updates/.
+> **Use this for:** Filing new weekly status updates in Projects/smaas/Status Updates/.
 
 ## This week
 -

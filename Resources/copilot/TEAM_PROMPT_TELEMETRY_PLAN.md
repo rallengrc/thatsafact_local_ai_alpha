@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS doc_citations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     turn_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
-    doc_path TEXT NOT NULL,               -- e.g. 'Projects/Burstable MLaaS/Reference/Ray and Flyte.md'
+    doc_path TEXT NOT NULL,               -- e.g. 'Projects/smaas/Reference/Ray and Flyte.md'
     citation_type TEXT NOT NULL,          -- 'context_read', 'tool_target', 'cited_in_solution'
     FOREIGN KEY (turn_id) REFERENCES prompt_turns (turn_id) ON DELETE CASCADE
 );

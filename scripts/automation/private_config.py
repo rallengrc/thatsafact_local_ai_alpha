@@ -19,10 +19,12 @@ from __future__ import annotations
 import json
 from pathlib import Path, PurePosixPath
 
-PRIVATE_DIR = "Projects/Burstable_MLaaS"
+PRIVATE_DIR = "Projects/smaas"
 LEGACY_PRIVATE_DIR = "Projects/Burstable MLaaS"
+ALT_LEGACY_PRIVATE_DIR = "Projects/Burstable_MLaaS"
 PRIVATE_CONFIG = f"{PRIVATE_DIR}/.generator-config.json"
 LEGACY_PRIVATE_CONFIG = f"{LEGACY_PRIVATE_DIR}/.generator-config.json"
+ALT_LEGACY_PRIVATE_CONFIG = f"{ALT_LEGACY_PRIVATE_DIR}/.generator-config.json"
 SECTIONS = ("doc_metadata", "indices")
 
 
@@ -30,7 +32,12 @@ def _inside_private_dir(key: str) -> bool:
     parts = PurePosixPath(key).parts
     base = PurePosixPath(PRIVATE_DIR).parts
     legacy_base = PurePosixPath(LEGACY_PRIVATE_DIR).parts
-    is_inside = (parts[: len(base)] == base or parts[: len(legacy_base)] == legacy_base)
+    alt_legacy_base = PurePosixPath(ALT_LEGACY_PRIVATE_DIR).parts
+    is_inside = (
+        parts[: len(base)] == base
+        or parts[: len(legacy_base)] == legacy_base
+        or parts[: len(alt_legacy_base)] == alt_legacy_base
+    )
     return is_inside and ".." not in parts and not PurePosixPath(key).is_absolute()
 
 
@@ -42,7 +49,11 @@ def load_private_config(workspace: Path | str) -> dict[str, dict]:
         if legacy_path.is_file():
             path = legacy_path
         else:
-            return {name: {} for name in SECTIONS}
+            alt_path = Path(workspace) / ALT_LEGACY_PRIVATE_CONFIG
+            if alt_path.is_file():
+                path = alt_path
+            else:
+                return {name: {} for name in SECTIONS}
     result: dict[str, dict] = {name: {} for name in SECTIONS}
     try:
         data = json.loads(path.read_text(encoding="utf-8"))

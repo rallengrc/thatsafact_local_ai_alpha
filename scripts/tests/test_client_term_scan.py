@@ -64,6 +64,7 @@ def test_clean_tree_has_no_hits(tmp_path, terms_file):
 
 
 def test_exempt_private_areas_are_skipped(tmp_path, terms_file):
+    write(tmp_path, "Projects/smaas/notes.md", "Zorblax SOW\n")
     write(tmp_path, "Projects/Burstable MLaaS/notes.md", "Zorblax SOW\n")
     write(tmp_path, "Inbox/plan.md", "Zorblax plan\n")
     write(tmp_path, "memories/log.md", "Zorblax log\n")

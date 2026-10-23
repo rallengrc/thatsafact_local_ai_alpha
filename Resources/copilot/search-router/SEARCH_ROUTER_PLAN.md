@@ -567,7 +567,7 @@ Resources/copilot/search-router/
 As the repository expanded to include 25 external reference codebases in `code/` (over 24,000 files across Flyte, Ray, Tantivy, etc.), a 2-engine (Ripgrep + ChromaDB) approach encounters fundamental scaling boundaries:
 
 1. **Ripgrep on 24,000 files is linear disk scanning:** Linear scans over 24k files across large repos takes 800ms–2s for cold queries.
-2. **ChromaDB dense vectors do not scale to 24k external code files:** Dense embeddings over 24k source files would destroy semantic retrieval precision for the user's primary workspace documents (`Projects/Burstable MLaaS/`).
+2. **ChromaDB dense vectors do not scale to 24k external code files:** Dense embeddings over 24k source files would destroy semantic retrieval precision for the user's primary workspace documents (`Projects/smaas/`).
 3. **Regex is code-blind:** Ripgrep does not understand AST hierarchies, call graphs, class inheritance, or function definitions across files.
 
 To solve this, Search Router v2 introduces a **4-Engine Multi-Index Architecture**:

@@ -227,7 +227,7 @@ mlaas/
 ├── memories/                      ← 💾 Persistent knowledge (survives sessions)
 │   ├── sessions/                  ← 📅 Session logs, prompt history, checkpoints
 │   └── repo/ · session/           ← 🔗 Workspace + current-session memory
-├── Projects/Burstable MLaaS/      ← 🚀 SOW, architecture, decisions, hello-mlaas-burst code
+├── Projects/smaas/                ← 🚀 SOW, architecture, decisions, hello-mlaas-burst code
 ├── scripts/                       ← 🔎 Search Router v2, indexing, MCP servers, tests
 ├── Resources/copilot/             ← 📚 AI methodology docs (you are here)
 └── Hello-MLaaS.md                 ← 🗺️ Executive technical guide
@@ -346,7 +346,7 @@ description: "Audit AWS cloud infrastructure and ML compute pipelines for cost o
 ```markdown
 ## MLaaS Architecture
 When working on orchestration, Ray, Flyte, or Karpenter topics, consult `Hello-MLaaS.md`
-and `Projects/Burstable MLaaS/Reference/Ray and Flyte - Orchestration and Distributed Compute.md`
+and `Projects/smaas/Reference/Ray and Flyte - Orchestration and Distributed Compute.md`
 
 ## Search Router
 When working on search or indexing, consult `Resources/copilot/search-router/TOOLS_REFERENCE.md`
@@ -364,8 +364,8 @@ When working on search or indexing, consult `Resources/copilot/search-router/TOO
 |-----|---------|
 | `Hello-MLaaS.md` | Executive guide: tri-environment model (Local Mac / AWS EKS / on-prem VMs), 4-node KinD topology, benchmarks |
 | `Projects/hello-mlaas-burst/PLAN.md` | Runnable code package, KinD config, RayJob manifest |
-| `Projects/Burstable MLaaS/Reference/Ray and Flyte - Orchestration and Distributed Compute.md` | Macro-vs-micro layering rationale |
-| `Projects/Burstable MLaaS/Reference/SOW - Scope.md` | Phase 1 deliverables and Phase 2 Support & Enhance |
+| `Projects/smaas/Reference/Ray and Flyte - Orchestration and Distributed Compute.md` | Macro-vs-micro layering rationale |
+| `Projects/smaas/Reference/SOW - Scope.md` | Phase 1 deliverables and Phase 2 Support & Enhance |
 | `Resources/copilot/search-router/TOOLS_REFERENCE.md` | Schemas for `search_workspace`, `search_symbols`, `search_everything` |
 
 ---
@@ -473,7 +473,7 @@ When working on search or indexing, consult `Resources/copilot/search-router/TOO
 - Architecture contract: Flyte = macro DAG/caching/lineage, Ray = ephemeral micro-compute, Karpenter = scale-to-zero GPUs
 - Current benchmark baselines (e.g., 2.44x–3.59x faster than the serial monolith at identical R² 0.9913, from `benchmark_metrics.db`)
 - Environment gotchas (`.venv` only, KinD 4-node config, corporate-proxy/internal-registry/MinIO for on-prem)
-- Active SOW phase and open risks → pointers to `Projects/Burstable MLaaS/`, not copies
+- Active SOW phase and open risks → pointers to `Projects/smaas/`, not copies
 
 **Sync Commands (workspace keyword convention):**
 | Command | What Happens |

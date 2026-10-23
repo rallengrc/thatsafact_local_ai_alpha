@@ -65,11 +65,11 @@ DOC_METADATA = {
     "Resources/Templates/Meeting Note.md": {
         "title": "Meeting Note Template",
         "description": "Obsidian/Markdown template for recording project meeting agendas, discussion notes, and action items",
-        "keywords": ["template", "meeting note", "agenda", "action items", "Burstable MLaaS"],
+        "keywords": ["template", "meeting note", "agenda", "action items", "smaas", "Burstable MLaaS"],
         "category": "template",
         "ai_search_aliases": ["meeting note template", "new meeting doc", "how to take meeting notes"],
         "tldr": "Standard Obsidian/Markdown template for capturing project meeting agendas, notes, action items, and SOW links.",
-        "use_for": "Creating new meeting notes in the Projects/Burstable MLaaS/Meetings/ directory."
+        "use_for": "Creating new meeting notes in the Projects/smaas/Meetings/ directory."
     },
     "Resources/Templates/Weekly Status Update.md": {
         "title": "Weekly Status Update Template",
@@ -78,7 +78,7 @@ DOC_METADATA = {
         "category": "template",
         "ai_search_aliases": ["weekly status template", "weekly update format", "status report template"],
         "tldr": "Standard template for submitting weekly project status reports, tracking task progress, blockers, upcoming work, and resource hours.",
-        "use_for": "Filing new weekly status updates in Projects/Burstable MLaaS/Status Updates/."
+        "use_for": "Filing new weekly status updates in Projects/smaas/Status Updates/."
     },
 
     # ---------------- RESOURCES / AWS ----------------

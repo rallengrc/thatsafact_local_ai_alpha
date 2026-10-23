@@ -65,7 +65,7 @@ def test_init_db(temp_db):
 def test_extract_cited_docs():
     text = (
         "Please inspect Resources/Templates/AI-SEARCHABLE-DOC-TEMPLATE.md and "
-        "update Projects/Burstable MLaaS/PLAN.md as needed."
+        "update Projects/smaas/PLAN.md as needed."
     )
     docs = extract_cited_docs(text)
     assert "Resources/Templates/AI-SEARCHABLE-DOC-TEMPLATE.md" in docs

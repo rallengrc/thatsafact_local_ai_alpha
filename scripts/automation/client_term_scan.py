@@ -34,13 +34,14 @@ except ImportError:  # standalone use
     def get_repo_root(anchor_file=None) -> Path:
         return Path(anchor_file).resolve().parents[2]
 
-DEFAULT_TERMS = "Projects/Burstable_MLaaS/.client-terms.txt"
+DEFAULT_TERMS = "Projects/smaas/.client-terms.txt"
 LEGACY_TERMS = "Projects/Burstable MLaaS/.client-terms.txt"
+ALT_LEGACY_TERMS = "Projects/Burstable_MLaaS/.client-terms.txt"
 
 # Areas that hold private or generated material and are never scanned.
 EXEMPT_PREFIXES = (
-    "Projects/Burstable_MLaaS/", "Projects/Burstable MLaaS/", "Inbox/", "memories/", "Archives/", "code/",
-    ".git/", ".venv/", ".chroma/", ".tantivy/", ".graphify/", ".pytest_cache/",
+    "Projects/smaas/", "Projects/Burstable_MLaaS/", "Projects/Burstable MLaaS/", "Inbox/", "memories/", "Archives/", "code/",
+    ".git/", ".venv/", ".chroma/", ".tantivy/", ".graphify/", ".pytest_cache/", ".idea/",
     "node_modules/", "__pycache__/", ".mcp.json",  # .mcp.json: gitignored, machine-local interpreter paths
 )
 
@@ -208,8 +209,11 @@ def main(argv: list[str] | None = None) -> int:
     terms_file = args.terms_file or (root / DEFAULT_TERMS)
     if not Path(terms_file).is_file():
         legacy = root / LEGACY_TERMS
+        alt_legacy = root / ALT_LEGACY_TERMS
         if legacy.is_file():
             terms_file = legacy
+        elif alt_legacy.is_file():
+            terms_file = alt_legacy
         else:
             print("notice: private terms file not found; generic classes only")
             terms_file = None

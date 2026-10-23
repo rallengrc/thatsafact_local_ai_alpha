@@ -26,16 +26,16 @@ def test_missing_file_returns_empty_sections(tmp_path):
 
 def test_loads_both_sections(tmp_path):
     write_cfg(tmp_path, {
-        "doc_metadata": {"Projects/Burstable MLaaS/Home.md": {"title": "Zorblax Home"}},
-        "indices": {"Projects/Burstable MLaaS/_INDEX.md": {"title": "Zorblax Index"}},
+        "doc_metadata": {"Projects/smaas/Home.md": {"title": "Zorblax Home"}},
+        "indices": {"Projects/smaas/_INDEX.md": {"title": "Zorblax Index"}},
     })
     cfg = pc.load_private_config(tmp_path)
-    assert cfg["doc_metadata"]["Projects/Burstable MLaaS/Home.md"]["title"] == "Zorblax Home"
-    assert cfg["indices"]["Projects/Burstable MLaaS/_INDEX.md"]["title"] == "Zorblax Index"
+    assert cfg["doc_metadata"]["Projects/smaas/Home.md"]["title"] == "Zorblax Home"
+    assert cfg["indices"]["Projects/smaas/_INDEX.md"]["title"] == "Zorblax Index"
 
 
 def test_missing_section_defaults_to_empty(tmp_path):
-    write_cfg(tmp_path, {"doc_metadata": {"Projects/Burstable MLaaS/a.md": {"title": "A"}}})
+    write_cfg(tmp_path, {"doc_metadata": {"Projects/smaas/a.md": {"title": "A"}}})
     assert pc.load_private_config(tmp_path)["indices"] == {}
 
 
@@ -46,7 +46,7 @@ def test_keys_outside_private_dir_are_rejected(tmp_path):
 
 
 def test_path_traversal_keys_are_rejected(tmp_path):
-    write_cfg(tmp_path, {"doc_metadata": {"Projects/Burstable MLaaS/../../x.md": {"title": "x"}}})
+    write_cfg(tmp_path, {"doc_metadata": {"Projects/smaas/../../x.md": {"title": "x"}}})
     with pytest.raises(ValueError, match="outside"):
         pc.load_private_config(tmp_path)
 
@@ -60,10 +60,10 @@ def test_invalid_json_raises_clear_error(tmp_path):
 
 
 def test_merged_adds_private_entries_without_mutating_base(tmp_path):
-    write_cfg(tmp_path, {"doc_metadata": {"Projects/Burstable MLaaS/a.md": {"title": "A"}}})
+    write_cfg(tmp_path, {"doc_metadata": {"Projects/smaas/a.md": {"title": "A"}}})
     base = {"README.MD": {"title": "R"}}
     merged = pc.merged_doc_metadata(base, tmp_path)
-    assert set(merged) == {"README.MD", "Projects/Burstable MLaaS/a.md"}
+    assert set(merged) == {"README.MD", "Projects/smaas/a.md"}
     assert set(base) == {"README.MD"}
 
 
