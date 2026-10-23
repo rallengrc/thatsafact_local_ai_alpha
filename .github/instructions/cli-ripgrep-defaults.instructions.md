@@ -1,14 +1,15 @@
 ---
-description: 'Use rg (ripgrep) for session-log mining, gitignored code/* subrepos, paths outside the workspace, and PCRE2 patterns that the built-in grep tool cannot reach. Load when searching transcripts, ~/.copilot, workspaceStorage, or code/.'
+description: 'Prioritize ripgrep (rg) for deep, fast regex, session-log mining, gitignored subrepos, and workspace searches.'
+applyTo: '**'
 ---
 
-# ripgrep for Out-of-Workspace and Subrepo Search
+# Ripgrep (rg) First for Deep & Out-of-Workspace Search
 
-Prefer the built-in grep tool for ordinary in-workspace search. Use `rg` (macOS/Linux) or `rg.exe` (Windows) in the terminal when the target is one of these:
+> **Principle:** Prefer `rg` / ripgrep over plain `grep` whenever possible for maximum performance, PCRE2 support, and subrepo reach.
 
-- `code/*` subrepos (gitignored at the root, so the built-in grep skips them): `rg "class FooImpl" code/`
-- Session logs and transcripts outside the workspace: `rg "user_prompt" ~/.copilot/`
-- PCRE2 patterns: `rg --pcre2 "\bMLaaS\b"`
-- Type-scoped search: `rg -t py "def test_" scripts/`
+1. **Subrepos & Gitignored Paths:** Use `rg` to search `code/*` subrepos (which are gitignored at root and skipped by standard grep): `rg "class Foo" code/`.
+2. **Session Logs & Telemetry:** Mine transcripts outside workspace: `rg "user_prompt" ~/.copilot/`.
+3. **Advanced Patterns:** Use `rg --pcre2` for complex lookaheads/lookbehinds and type filters (`rg -t py`).
+4. **Platform Resolution:** Call `find_executable("rg")` via `scripts/common_platform.py` on Windows (`rg.exe`) and macOS (`/opt/homebrew/bin/rg`).
 
-Full patterns: [ripgrep-scenarios-and-patterns.md](references/ripgrep-scenarios-and-patterns.md).
+📄 **See Also:** [ripgrep-scenarios-and-patterns.md](references/ripgrep-scenarios-and-patterns.md) for full scenario catalog and benchmarking.

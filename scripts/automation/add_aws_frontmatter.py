@@ -54,6 +54,18 @@ META = {
         "keywords": ["Amazon EKS", "AWS", "Kubernetes", "cluster", "node group", "autoscaling", "GPU", "add-ons"],
         "aliases": ["eks user guide", "aws eks", "kubernetes on aws"],
     },
+    "step-functions-api": {
+        "title": "AWS Step Functions API Reference",
+        "desc": "Complete AWS Step Functions API reference covering state machine definitions, executions, activities, task tokens, and workflow orchestration operations.",
+        "keywords": ["AWS Step Functions", "AWS", "Step Functions API", "state machine", "workflow orchestration", "task tokens", "executions", "activities"],
+        "aliases": ["step functions api", "aws step functions reference", "step functions api reference"],
+    },
+    "step-functions-dg": {
+        "title": "AWS Step Functions Developer Guide",
+        "desc": "Comprehensive AWS Step Functions developer guide covering distributed orchestration, state machine patterns, error handling, task integrations, and event-driven workflows.",
+        "keywords": ["AWS Step Functions", "AWS", "workflow orchestration", "state machine", "distributed workflows", "event-driven", "task integration", "error handling"],
+        "aliases": ["step functions developer guide", "step functions user guide", "aws step functions dg"],
+    },
 }
 
 

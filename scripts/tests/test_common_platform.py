@@ -122,6 +122,8 @@ class TestGetRepoRoot:
 
     def test_get_repo_root_env_var_when_walk_fails(self, tmp_path, monkeypatch):
         """THESAFACT_AI_ROOT / MLAAS_ROOT is used only when no marker is found above the anchor."""
+        monkeypatch.delenv("THESAFACT_AI_ROOT", raising=False)
+        monkeypatch.delenv("THESAFACT_LOCAL_AI_ROOT", raising=False)
         env_repo = tmp_path / "env_repo"
         (env_repo / ".git").mkdir(parents=True)
         anchor = tmp_path / "loose" / "script.py"
@@ -139,6 +141,8 @@ class TestGetRepoRoot:
 
     def test_get_repo_root_env_var_without_markers_is_ignored(self, tmp_path, monkeypatch):
         """A MLAAS_ROOT that is not a repo root must not be trusted."""
+        monkeypatch.delenv("THESAFACT_AI_ROOT", raising=False)
+        monkeypatch.delenv("THESAFACT_LOCAL_AI_ROOT", raising=False)
         bogus = tmp_path / "bogus"
         bogus.mkdir()
         anchor = tmp_path / "loose" / "script.py"

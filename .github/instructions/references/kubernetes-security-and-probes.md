@@ -1,10 +1,51 @@
 # Kubernetes Security Contexts, Health Probes & Validation
 
-> **Source:** Awesome Copilot (`code/awesome-copilot/instructions/kubernetes-manifests.instructions.md`)
+> **Source:** Awesome Copilot (`code/awesome-copilot/instructions/kubernetes-manifests.instructions.md`)  
+> 📄 **Instruction Hub:** `.github/instructions/kubernetes-manifests.instructions.md`
 
 ---
 
-## 1. Health & Liveness Probes
+## 1. Standard Labels & Metadata
+
+All manifests MUST include standard Kubernetes labels:
+
+```yaml
+metadata:
+  labels:
+    app.kubernetes.io/name: "ray-cluster"
+    app.kubernetes.io/instance: "mlaas-burst-ray"
+    app.kubernetes.io/component: "worker" # head, worker, or controller
+    app.kubernetes.io/part-of: "mlaas-pipeline"
+    app.kubernetes.io/managed-by: "kuberay-operator"
+```
+
+---
+
+## 2. Security Context Defaults (Restricted Profile)
+
+Never run containers as root or allow privilege escalation:
+
+```yaml
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: worker
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
+```
+
+---
+
+## 3. Health & Liveness Probes
 
 Configure probes to prevent routing traffic to deadlocked or initialising pods:
 

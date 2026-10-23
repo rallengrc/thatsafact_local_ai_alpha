@@ -18,7 +18,7 @@ keywords: [workflows, commands, pytest, indexing, debugging, search-router, oper
 Always use `.venv/bin/python3` or `.venv/bin/pytest`:
 
 ```bash
-# Run complete test suite (136 tests)
+# Run complete test suite (251 tests)
 .venv/bin/python3 -m pytest scripts/tests/ -v
 
 # Run targeted test files

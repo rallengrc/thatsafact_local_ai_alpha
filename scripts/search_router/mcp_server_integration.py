@@ -190,7 +190,14 @@ def pattern_3_subprocess_integration():
             if threshold is not None:
                 cmd.extend(["--threshold", str(threshold)])
 
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=30,
+            )
 
             # Parse JSON output (skip INFO lines)
             lines = [
@@ -215,7 +222,14 @@ def pattern_3_subprocess_integration():
                 str(limit),
             ]
 
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=30,
+            )
             # Filter out INFO lines
             lines = [line for line in result.stdout.split("\n") if not line.startswith("INFO:")]
             return "\n".join(lines)
@@ -223,7 +237,14 @@ def pattern_3_subprocess_integration():
         def stats(self) -> dict:
             """Get stats via subprocess."""
             cmd = [sys.executable, "scripts/mcp_search_router.py", "--stats"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=30,
+            )
 
             # Parse JSON output (skip INFO lines)
             lines = [
