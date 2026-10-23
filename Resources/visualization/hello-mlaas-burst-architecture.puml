@@ -1,0 +1,71 @@
+@startuml hello-mlaas-burst-architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam roundCorner 8
+skinparam shadowing false
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #6C757D
+  FontColor #212529
+}
+
+skinparam node {
+  BackgroundColor #E9ECEF
+  BorderColor #495057
+  FontColor #212529
+}
+
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #495057
+  FontColor #212529
+}
+
+title Hello MLaaS Burst — Tri-Environment & Flyte+Ray Architecture
+
+package "Target 1: Local Mac (Apple Silicon KinD)" as LocalMac {
+  node "KinD 4-Node Container Cluster" {
+    component "mlaas-control-plane\nK8s API & etcd" as MacCP
+    component "mlaas-platform-infra\nFlyte Core & MinIO" as MacInfra
+    component "mlaas-ray-head\nRay GCS & Dashboard (8265)" as MacHead
+    component "mlaas-burst-worker\nSimulated GPU Worker (MPS/CPU)" as MacWorker
+  }
+}
+
+package "Target 2: AWS EKS Burstable Production" as AwsEks {
+  node "EKS Production Cluster" {
+    component "FlyteAdmin & Propeller\nGeneral Purpose Nodes (m6i)" as EKSFlyte
+    component "KubeRay Operator\nController" as KubeRay
+    component "Karpenter Auto-scaler\nDynamic Node Provisioner" as Karpenter
+    node "Ephemeral GPU Node Pool\n(8x H100 p5.48xlarge)" as GpuNode {
+      component "Ray Worker Pods\nNCCL All-Reduce" as RayGpuWorkers
+    }
+  }
+}
+
+package "Target 3: On-Premises (Firewall VMs)" as OnPrem {
+  node "Corporate Infrastructure" {
+    component "Air-gapped Container Registry\nInternal Container Images" as Registry
+    component "Internal MinIO S3\nEncrypted Object Store" as OnPremS3
+    component "Static VM Ray Cluster\nPre-allocated GPU Workers" as OnPremRay
+  }
+}
+
+package "Flyte Macro-DAG Pipeline (surrogate_pipeline)" as FlyteDAG {
+  component "Step 1: generate_mesh_data\nCPU Task - Cached\nGenerates airfoil mesh & CFD polar baseline" as Step1
+  component "Step 2: train_surrogate_burst\nRay Distributed Compute Task\nDispatches across Ray parallel workers" as Step2
+  component "Step 3: evaluate_surrogate\nCPU Task\nBenchmarks 72,000x speedup vs 48hr CFD" as Step3
+}
+
+Step1 --> Step2 : Typed FlyteFile (Parquet)
+Step2 --> Step3 : Model Weights & R2 Score
+
+Step2 ..> MacWorker : Executes on Mac (KinD)
+Step2 ..> KubeRay : Submits RayJob on AWS EKS
+KubeRay --> Karpenter : Requests nvidia.com/gpu
+Karpenter --> GpuNode : Provisions EC2 GPU nodes
+Step2 ..> OnPremRay : Connects to internal VM cluster
+
+@enduml

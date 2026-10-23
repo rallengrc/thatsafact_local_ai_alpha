@@ -1,0 +1,38 @@
+flowchart TD
+    User([AI Agent / User]) --> Query[Inbound Query String]
+    Query --> Analyzer[QueryAnalyzer<br/>Intent Detection]
+
+    subgraph Preprocessing["Phase 1: Preprocessing & Intent Classification"]
+        Analyzer
+    end
+
+    subgraph Engines["Phase 2: Multi-Index Engine Retrieval"]
+        Tantivy[(Tantivy BM25<br/>.tantivy/ Inverted Index<br/>p50: 0.10 ms)]
+        Graphify[(Graphify AST Graph<br/>.graphify/ Tree-sitter AST<br/>p50: 0.26 ms)]
+        Chroma[(ChromaDB Vectors<br/>.chroma/ Dense Embeddings<br/>p50: 46.28 ms)]
+        Ripgrep[Ripgrep Livetext<br/>Live Disk Regex Scan<br/>p50: 9.65 ms]
+        Ollama[Local Ollama LLM<br/>qwen3.8:27b on MLX<br/>Zero Cloud Spend]
+    end
+
+    subgraph Postprocessing["Phase 3: Postprocessing & Fusion"]
+        SpanDedupe[AST Span Containment<br/>Merges line hits into AST parent spans]
+        RRF[Reciprocal Rank Fusion<br/>RRF score: sum of w / 60+rank]
+        Curator[LLM Context Curator<br/>Token Budget ≤ 4,000 tokens]
+    end
+
+    FinalContext[Clean Curated Context<br/>Zero Redundancy] --> User
+
+    Analyzer -->|Broad Keyword / Boolean| Tantivy
+    Analyzer -->|Code Symbol / Def / Class| Graphify
+    Analyzer -->|Natural Language / Conceptual| Chroma
+    Analyzer -->|Exact Literal / Regex| Ripgrep
+    Graphify <-->|Local AST Analysis| Ollama
+
+    Tantivy --> SpanDedupe
+    Graphify --> SpanDedupe
+    Ripgrep --> SpanDedupe
+    Chroma --> RRF
+
+    SpanDedupe --> RRF
+    RRF --> Curator
+    Curator --> FinalContext

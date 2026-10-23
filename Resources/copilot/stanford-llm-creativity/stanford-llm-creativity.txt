@@ -1,0 +1,178 @@
+Stanford Just Killed Prompt Engineering With 8 Words (And I Can’t Believe It Worked)
+ChatGPT keeps giving you the same boring response? This new technique unlocks 2× more creativity from ANY AI model — no training required. Here’s how it works.
+ 
+Adham Khaled
+Follow
+8 min read
+·
+Oct 20, 2025
+25K
+662
+NEW UPDATE, 7 Nov.
+The PromptBook is now available on Gumroad: How to Get 10x More Creative AI Outputs: The Verbalized Sampling Promptbook
+NEW UPDATE, 5 DEC. After this crazy November, New 16 VS Prompts customized for Marketing, Research & Business, Creative Writing, and Education: The Verbalized Sampling OS: 16 System Prompts for Gemini 3, GPT-5.1, Claude 4.5 & Grok 4.1
+Check this Article: The Constructive Lie: Why Telling Your LLM the Wrong Answer Makes It Smarter
+I asked ChatGPT to tell me a joke about coffee five times.
+Same joke. Every. Single. Time.
+“Why did the coffee file a police report? It got mugged!”
+I tried temperature adjustments. Different phrasings. Creative system prompts. Nothing worked.
+And I thought: Is this it? Is this the ceiling of AI creativity?
+Turns out, I was asking the wrong question.
+The Day Everything Changed
+Three weeks ago, a research paper dropped that flipped everything we thought we knew about AI alignment on its head.
+No billion-dollar retraining. No complex fine-tuning. Just eight words that unlock creativity we thought was lost forever. 
+The paper comes from Stanford, Northeastern, and West Virginia University. The technique is called Verbalized Sampling. And it’s so stupidly simple that when I first tried it, I actually laughed out loud. 
+Because it worked.
+Let me show you what they discovered.
+Press enter or click to view image in full size
+ 
+The Problem Nobody Wanted to Admit
+Here’s the uncomfortable truth: Post-training alignment broke our AI models. 
+When OpenAI, Google, and Anthropic trained ChatGPT, Gemini, and Claude to be “helpful and harmless,” something catastrophic happened under the hood. The models collapsed. 
+Ask any aligned model for creative output — poems, jokes, stories, ideas — and you’ll get the most stereotypical, safe, boring response possible. Every time. 
+The AI community called it “mode collapse.” And everyone blamed the algorithms. 
+RLHF. DPO. Reward models. We thought these training techniques permanently damaged the model’s creativity. 
+We were wrong.
+The Real Culprit: Your Brain
+The Stanford team dug deeper. They analyzed 6,874 human preference ratings from the HelpSteer dataset. 
+What they found was shocking.
+Human annotators are biased — systematically. 
+When humans rate AI outputs, they don’t just pick the “best” answer. They pick the most familiar one. The most conventional. The most typical. 
+It’s not conscious. It’s cognitive psychology at work: 
+Mere-exposure effect: We prefer what we’ve seen before
+Availability heuristic: Common responses feel more “correct”
+Processing fluency: Easy-to-process content seems higher quality
+Schema congruity: Information matching our mental models gets rated higher
+The math is brutal: typicality bias weight α = 0.57±0.07 (p<10^-14). 
+Translation? When training AI to match human preferences, we accidentally trained it to be boring. 
+And here’s the kicker: The creativity isn’t gone. It’s just trapped.
+The 8-Word Solution
+Instead of asking:
+“Tell me a joke about coffee”
+Ask this:
+“Generate 5 jokes about coffee with their probabilities”
+That’s it. 
+No retraining. No API changes. No special access needed.
+Just a different way of asking. 
+When I first tried this, I got five completely different coffee jokes. Each one unique. Each one actually funny. 
+The fifth one? “What do you call a cow who’s just given birth? De-calf-inated!”
+I’d never seen ChatGPT generate that before.
+Why This Actually Works (The Science)
+Different prompts collapse to different modes. 
+When you ask for ONE response, the model gives you the single most “typical” answer — the peak of the probability distribution. 
+When you ask for FIVE responses, the model gives you a uniform list of related items. 
+But when you ask for responses with their probabilities? Magic happens. 
+The model interprets this as: “Give me a sample from the actual distribution I learned during pretraining” — not the collapsed, over-aligned version. 
+It’s like asking someone: “What ice cream flavors do you like?” versus “List all ice cream flavors with how much you like each one.”
+The second question forces deeper, more diverse thinking. 
+How to Use It Right Now (3 Methods)
+NEW UPDATE, 7 Nov.
+The PromptBook is now available on Gumroad: How to Get 10x More Creative AI Outputs: The Verbalized Sampling Promptbook
+NEW UPDATE, 5 DEC. After this crazy November, New 16 VS Prompts customized for Marketing, Research & Business, Creative Writing, and Education: The Verbalized Sampling OS: 16 System Prompts for Gemini 3, GPT-5.1, Claude 4.5 & Grok 4.1
+Method 1: Copy-Paste Magic (Works on ANY Chatbot)
+Open ChatGPT, Claude, Gemini, or any AI model. Paste this: 
+<instructions>
+Generate 5 responses to the user query, each within a separate <response> tag. Each <response> must include a <text> and a numeric <probability>. Randomly sample responses from the full distribution.
+</instructions>
+
+[Your actual prompt here]
+Example:
+<instructions>
+Generate 5 responses to the user query, each within a separate <response> tag. Each <response> must include a <text> and a numeric <probability>. Randomly sample responses from the full distribution.
+</instructions>
+
+Write a 100-word story about an astronaut who discovers something unexpected.
+Want more? Just ask: “Give me 5 more”. 
+More Prompt examples? Follow and subscribe via email to get a notification when I publish my BOOK that full of tested examples and prompts in all fields.
+Method 2: System Prompt (Pro Move)
+If you’re using ChatGPT’s custom instructions or building an AI app, add this to your system prompt: 
+You are a helpful assistant.
+For each query, please generate a set of five possible responses, each within a separate <response> tag.
+Responses should each include a <text> and a numeric <probability>.
+Please sample at random from the tails of the distribution, such that the probability of each response is less than 0.10.
+This makes EVERY response more creative automatically. 
+More Prompt examples? Follow and subscribe via email to get a notification when I publish my BOOK that full of tested examples and prompts in all fields.
+Method 3: Python Package (For Developers)
+Install the official Verbalized Sampling package: 
+pip install verbalized-sampling
+Use it in your code:
+from verbalized_sampling import verbalize
+
+# Generate diverse responses
+dist = verbalize(
+    "Write a marketing tagline for a coffee shop",
+    k=5,
+    tau=0.10,
+    temperature=0.9
+)
+# Sample from the distribution
+tagline = dist.sample(seed=42)
+print(tagline.text)
+The Results Are Insane
+The Stanford team tested this across every major AI model and task: 
+Creative Writing
+1.6–2.1× diversity increase on poems, stories, jokes
+66.8% recovery of base model creativity (vs. 23.8% without it)
+25.7% improvement in human preference ratings (tested on 2,700 ratings)
+Dialogue & Conversations
+Performance matches fine-tuned models on persuasion tasks
+More human-like, less robotic responses
+Open-Ended Questions
+1.9× increase in answer variety for questions with multiple valid perspectives
+Synthetic Data Generation
+14–28% improvement in downstream task accuracy when using VS-generated training data
+And here’s the emergent trend that blew my mind: 
+Larger models benefit MORE from this.
+GPT-4.1 gets 2× the diversity boost compared to GPT-4.1-Mini. 
+The bigger the model, the more trapped creativity it has waiting to be unlocked. 
+What This Actually Means
+For two years, we thought alignment broke AI.
+We thought mode collapse was permanent damage. A necessary trade-off for safety and helpfulness. 
+We were wrong about everything. 
+The creativity was never lost. We just forgot how to access it.
+This isn’t just a prompting trick. It’s a fundamental insight into how aligned models work: 
+Mode collapse isn’t an algorithm problem — it’s a prompting problem. 
+The diversity is still there, encoded in the model’s weights. Post-training didn’t erase it. It just made certain modes more accessible than others. 
+What You Can Do With This
+I’ve been using Verbalized Sampling for everything this week:
+Brainstorming: Instead of getting 3 variations of the same idea, I get genuinely different approaches. 
+Content Creation: Blog titles, social media posts, email subject lines — all more creative. 
+Problem Solving: Multiple solution paths instead of one “safe” recommendation. 
+Image Generation: More diverse visual outputs when I feed the varied prompts to Midjourney or DALL-E. 
+Synthetic Data: Training smaller models with more diverse examples. 
+One guy on Twitter tested this for joke generation and said: “Ask ChatGPT for five answers instead of one, and watch the boring disappear”. 
+He’s right.
+The Bigger Picture
+This changes how we think about AI alignment. 
+For years, researchers worried that making AI “safe” meant making it “stupid.” That creativity and helpfulness were at odds. 
+Verbalized Sampling proves they’re not. 
+The safety is still there. When I tested this on factual questions and commonsense reasoning, accuracy didn’t drop. Safety didn’t degrade. 
+But the creativity came back.
+It was hiding in plain sight this whole time.
+Try It Yourself
+Open ChatGPT right now.
+Ask it: “Generate 5 creative project ideas for learning Python, each with their probability.”
+Watch what happens.
+Then ask the same question without the probability part. Compare the results.
+You’ll see the difference immediately.
+The AI you thought was “limited” was just waiting for the right question. 
+Resources to Go Deeper
+Read the paper: arxiv.org/abs/2510.01171 
+GitHub repo: github.com/CHATS-lab/verbalized-sampling 
+Official website: verbalized-sampling.com 
+Interactive demos: Colab notebooks available on GitHub 
+The Final Word
+NEW UPDATE, 7 Nov.
+The PromptBook is now available on Gumroad: How to Get 10x More Creative AI Outputs: The Verbalized Sampling Promptbook
+I recently posted the copy-paste system prompts here: Verbalized Sampling System Prompts
+Check my recent story about Context Engineering based on Shanghai: Shanghai’s GAIR Research Just Reframed AI: Context Engineering 2.0 Replaces Prompt Engineering!
+NEW UPDATE, 5 DEC. After this crazy November, New 16 VS Prompts customized for Marketing, Research & Business, Creative Writing, and Education: The Verbalized Sampling OS: 16 System Prompts for Gemini 3, GPT-5.1, Claude 4.5 & Grok 4.1
+Check my New Article like this one: I Asked AI to Build a Bomb in Iambic Pentameter. It Said Yes!
+RIP prompt engineering?
+Maybe not dead. But definitely reborn.
+For two years, we optimized prompts trying to squeeze more creativity from aligned models. We failed because we were asking the wrong question. 
+We don’t need better prompts. We need better questions.
+And sometimes, the answer is as simple as asking for five responses instead of one. 
+The AI bottleneck just got solved with 8 words.
+What will you create now that the creativity is unlocked?
+

@@ -1,0 +1,71 @@
+@startuml lean-context-engineering
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam handwritten false
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #6C757D
+  FontColor #212529
+}
+
+skinparam component {
+  BackgroundColor #E9ECEF
+  BorderColor #495057
+  FontColor #212529
+}
+
+skinparam note {
+  BackgroundColor #FFF3CD
+  BorderColor #856404
+  FontColor #856404
+}
+
+title Lean AI Context Engineering Pattern
+
+package "Layer 1: Lean Orchestrators (<= 100 Lines)" as L1 {
+  component [Root .instructions.md\n(General Agent Orchestrator)] as RootInst
+  component [.github/copilot-instructions.md\n(System Prompt Orchestrator)] as CopilotInst
+  component [Domain Skills\n(*.SKILL.md <= 100L)] as Skills
+}
+
+note right of L1
+  <b>Single Source of Truth:</b>
+  Contains triggers, brief TL;DR,
+  and dispatch routing tables only.
+  Never inlines bulky examples.
+end note
+
+package "Layer 2: Fast Dispatch & Filtering (applyTo)" as L2 {
+  component [Path Matcher / applyTo\n(e.g., **/*.py, **/*.md)] as Dispatcher
+  component [Skill Trigger Matcher\n(e.g., 'speed-test', 'teach-mode')] as Triggers
+}
+
+package "Layer 3: Modular Reference Tier (<= 150 Lines)" as L3 {
+  component [agent-workflows.md\n(Pytest, CLI commands, scripts)] as WorkflowsRef
+  component [code-standards.md\n(Python imports, error handling)] as StandardsRef
+  component [lean-rules-reference.md\n(Line limits, anti-patterns)] as LeanRef
+  component [Deep Documentation\n(SEARCH_ROUTER_PLAN.md, etc.)] as DeepDocs
+}
+
+package "AI Context Window (Target: >= 80% Free)" as ContextWindow {
+  component [System & Agent Directives\n(~5% - 15% tokens used)] as Directives
+  component [Available Context for User Code & AST\n(85% - 95% tokens preserved)] as UserContext
+}
+
+RootInst --> Dispatcher : auto-loads
+CopilotInst --> Dispatcher : enforces
+Skills --> Triggers : matches intent
+
+Dispatcher --> WorkflowsRef : on-demand
+Dispatcher --> StandardsRef : on-demand
+Dispatcher --> LeanRef : on-demand
+Triggers --> DeepDocs : references
+
+L1 --> Directives : injects minimal tokens
+L3 ..> Directives : loaded only when needed
+
+@enduml

@@ -1,0 +1,35 @@
+flowchart TD
+    subgraph L1["Layer 1: Lean Orchestrators (≤ 100 Lines)"]
+        RootInst["Root .instructions.md<br/>(General Agent Orchestrator)"]
+        CopilotInst[".github/copilot-instructions.md<br/>(System Prompt Orchestrator)"]
+        Skills["Domain Skills<br/>(SKILL.md ≤ 100L)"]
+    end
+
+    subgraph L2["Layer 2: Fast Dispatch & Filtering (applyTo)"]
+        Dispatcher["Path Matcher / applyTo<br/>(e.g., **/*.py, **/*.md)"]
+        Triggers["Skill Trigger Matcher<br/>(e.g., speed-test, teach-mode)"]
+    end
+
+    subgraph L3["Layer 3: Modular Reference Tier (≤ 150 Lines)"]
+        WorkflowsRef["agent-workflows.md<br/>(Pytest, CLI commands, scripts)"]
+        StandardsRef["code-standards.md<br/>(Python imports, conventions)"]
+        LeanRef["lean-rules-reference.md<br/>(Line limits, anti-patterns)"]
+        DeepDocs["Deep Documentation<br/>(SEARCH_ROUTER_PLAN.md, etc.)"]
+    end
+
+    subgraph Context["AI Context Window (≥ 80% Preserved)"]
+        Directives["System Directives (~10% tokens)"]
+        UserContext["User Code, AST & Results (90% tokens)"]
+    end
+
+    RootInst --> Dispatcher
+    CopilotInst --> Dispatcher
+    Skills --> Triggers
+
+    Dispatcher --> WorkflowsRef
+    Dispatcher --> StandardsRef
+    Dispatcher --> LeanRef
+    Triggers --> DeepDocs
+
+    L1 -.-> Directives
+    L3 -.-> Directives

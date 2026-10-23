@@ -1,0 +1,83 @@
+@startuml search-router-v2-architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam roundCorner 8
+skinparam shadowing false
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #6C757D
+  FontColor #212529
+}
+
+skinparam component {
+  BackgroundColor #E9ECEF
+  BorderColor #495057
+  FontColor #212529
+}
+
+skinparam database {
+  BackgroundColor #E2E3E5
+  BorderColor #383D41
+  FontColor #212529
+}
+
+skinparam note {
+  BackgroundColor #D1ECF1
+  BorderColor #0C5460
+  FontColor #0C5460
+}
+
+title Search Router v2 — 4-Engine Multi-Index Architecture & Lean Context Flow
+
+actor "AI Agent / User" as User
+component [Query String] as Query
+
+package "Phase 1: Preprocessing & Query Intent Classification" as Preprocessing {
+  component [QueryAnalyzer\n(Intent Detection)] as Analyzer
+  note right of Analyzer
+    Routes based on syntax:
+    - def/class/PascalCase -> Graphify AST
+    - Quotes/regex wildcards -> Ripgrep
+    - 1-2 keywords/boolean -> Tantivy BM25
+    - Natural language -> ChromaDB Vector
+  end note
+}
+
+package "Phase 2: Multi-Index Engine Retrieval" as Engines {
+  database "Tantivy BM25\n.tantivy/ - Rust Inverted Index\np50: 0.10 ms" as Tantivy
+  database "Graphify AST Graph\n.graphify/ - Tree-sitter + NetworkX\np50: 0.26 ms" as Graphify
+  database "ChromaDB Vectors\n.chroma/ - Dense Embeddings\np50: 46.28 ms" as Chroma
+  component "Ripgrep Livetext\nLive Disk Regex Scan\np50: 9.65 ms" as Ripgrep
+  component "Local Ollama LLM\nqwen3.8:27b on MLX\nZero Cloud Spend" as Ollama
+}
+
+package "Phase 3: Postprocessing & Fusion" as Postprocessing {
+  component "AST Span Containment\nMerges line hits into AST spans" as SpanDedupe
+  component "Reciprocal Rank Fusion\nRRF score: sum of w / (60+rank)" as RRF
+  component "LLM Context Curator\nToken Budget <= 4000 tokens" as Curator
+}
+
+component "Clean Curated Context\nZero Redundancy" as FinalContext
+
+User --> Query
+Query --> Analyzer
+
+Analyzer --> Tantivy : Broad Keyword
+Analyzer --> Graphify : Symbol / Class / Def
+Analyzer --> Chroma : Conceptual / Q&A
+Analyzer --> Ripgrep : Regex / Literal
+Graphify <..> Ollama : Local enrichment
+
+Tantivy --> SpanDedupe : BM25 hits
+Graphify --> SpanDedupe : AST nodes
+Chroma --> RRF : Similarity hits
+Ripgrep --> SpanDedupe : Line matches
+
+SpanDedupe --> RRF : Deduplicated entities
+RRF --> Curator : Fused rank order
+Curator --> FinalContext : Formatted context
+FinalContext --> User : Delivers to Agent
+
+@enduml

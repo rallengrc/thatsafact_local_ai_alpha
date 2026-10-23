@@ -1,0 +1,165 @@
+# KubeRay RayJob manifest for AWS EKS & On-Premise Kubernetes.
+# Deploys an ephemeral Ray cluster, runs surrogate training, then shuts down.
+#
+# Replace the image placeholders below with your registry path (ECR on AWS, an internal registry on-prem)
+# and pin an immutable tag or digest. Image is built from ./Dockerfile.
+# Worker nodes are provisioned by a Karpenter NodePool named "gpu-burst" (not defined here).
+apiVersion: ray.io/v1
+kind: RayJob
+metadata:
+  name: hello-mlaas-surrogate-burst
+  namespace: mlaas-workloads
+  labels:
+    app.kubernetes.io/name: ray-job
+    app.kubernetes.io/instance: hello-mlaas-surrogate-burst
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/part-of: mlaas-pipeline
+    app.kubernetes.io/managed-by: kuberay-operator
+spec:
+  entrypoint: python3 /app/workflow.py
+  shutdownAfterJobFinishes: true
+  ttlSecondsAfterFinished: 60
+  rayClusterSpec:
+    rayVersion: '2.59.0'
+    headGroupSpec:
+      rayStartParams:
+        dashboard-host: '0.0.0.0'
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ray-cluster
+            app.kubernetes.io/instance: mlaas-burst-ray
+            app.kubernetes.io/component: head
+            app.kubernetes.io/part-of: mlaas-pipeline
+            app.kubernetes.io/managed-by: kuberay-operator
+        spec:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          nodeSelector:
+            role: mlaas-head-node
+          containers:
+            - name: ray-head
+              image: REGISTRY/mlaas/surrogate-runner:TAG
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              resources:
+                requests:
+                  cpu: "2000m"
+                  memory: "4Gi"
+                limits:
+                  cpu: "4000m"
+                  memory: "8Gi"
+              livenessProbe:
+                httpGet:
+                  path: /api/local_raylet_healthz
+                  port: 52365
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                timeoutSeconds: 5
+                failureThreshold: 3
+              readinessProbe:
+                httpGet:
+                  path: /api/local_raylet_healthz
+                  port: 52365
+                initialDelaySeconds: 15
+                periodSeconds: 5
+                timeoutSeconds: 3
+                successThreshold: 1
+                failureThreshold: 2
+              volumeMounts:
+                - name: tmp-volume
+                  mountPath: /tmp
+                - name: shm-volume
+                  mountPath: /dev/shm
+          volumes:
+            - name: tmp-volume
+              emptyDir: {}
+            # Backs Ray's shared-memory object store
+            - name: shm-volume
+              emptyDir:
+                medium: Memory
+                sizeLimit: 2Gi
+    workerGroupSpecs:
+      - groupName: gpu-burst-workers
+        replicas: 2
+        minReplicas: 0
+        maxReplicas: 8
+        rayStartParams: {}
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/name: ray-cluster
+              app.kubernetes.io/instance: mlaas-burst-ray
+              app.kubernetes.io/component: worker
+              app.kubernetes.io/part-of: mlaas-pipeline
+              app.kubernetes.io/managed-by: kuberay-operator
+          spec:
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 1000
+              runAsGroup: 1000
+              fsGroup: 1000
+              seccompProfile:
+                type: RuntimeDefault
+            # Karpenter provisions GPU instances when this pod matches
+            nodeSelector:
+              karpenter.sh/nodepool: gpu-burst
+            tolerations:
+              - key: "nvidia.com/gpu"
+                operator: "Exists"
+                effect: "NoSchedule"
+            containers:
+              - name: ray-worker
+                image: REGISTRY/mlaas/surrogate-runner:TAG
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  readOnlyRootFilesystem: true
+                  capabilities:
+                    drop: ["ALL"]
+                resources:
+                  requests:
+                    cpu: "4000m"
+                    memory: "16Gi"
+                    nvidia.com/gpu: "1"
+                  limits:
+                    cpu: "8000m"
+                    memory: "32Gi"
+                    nvidia.com/gpu: "1"
+                livenessProbe:
+                  httpGet:
+                    path: /api/local_raylet_healthz
+                    port: 52365
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+                readinessProbe:
+                  httpGet:
+                    path: /api/local_raylet_healthz
+                    port: 52365
+                  initialDelaySeconds: 15
+                  periodSeconds: 5
+                  timeoutSeconds: 3
+                  successThreshold: 1
+                  failureThreshold: 2
+                volumeMounts:
+                  - name: tmp-volume
+                    mountPath: /tmp
+                  - name: shm-volume
+                    mountPath: /dev/shm
+            volumes:
+              - name: tmp-volume
+                emptyDir: {}
+              # Backs Ray's shared-memory object store
+              - name: shm-volume
+                emptyDir:
+                  medium: Memory
+                  sizeLimit: 2Gi

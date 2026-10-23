@@ -1,0 +1,151 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Sub repos
+code/
+
+# Embedded external / private git repositories (space-free naming)
+Projects/Burstable_MLaaS/
+Projects/Burstable MLaaS/
+Resources/third_party_docs/
+
+# Third-party copyrighted content (book preview, publisher images, stock photo)
+Areas/what-is-PARA/
+Resources/marlon-brando-the-godfather-vito-corleone.jpg
+
+# Local working notes
+.ledger.md
+
+# Private AI memory and session logs (keep the directory, ignore its contents)
+memories/*
+!memories/.gitkeep
+
+# Local git worktrees (isolated feature workspaces; see .github/skills/using-git-worktrees)
+.worktrees/
+worktrees/
+
+# Chroma database index of the project
+.chroma
+.tantivy
+.graphify
+
+# Ephemeral local prompt analytics databases (built on the fly from markdown)
+prompts_analytics.db
+prompts_analytics.db-journal
+prompts_analytics.db-wal
+prompts_analytics.db-shm
+*prompt_telemetry*.db
+*prompt_telemetry*.db-journal
+*prompt_telemetry*.db-wal
+*prompt_telemetry*.db-shm
+
+# Ephemeral benchmark metrics database (built at runtime by local_runner / benchmark_runner)
+benchmark_metrics.db*
+
+
+# Lock files
+.~lock.*
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables & secrets (keys, tokens, credentials)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Static analysis, linters & formatters
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter / interactive notebooks
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Markdown / documentation build outputs & static site generators
+# MkDocs
+site/
+
+# Sphinx
+_build/
+docs/_build/
+
+# Docusaurus / VitePress / general SSG node outputs
+node_modules/
+.docusaurus/
+.vitepress/dist/
+.vitepress/cache/
+
+# Markdown lint / link-check artifacts
+.markdownlint-cli2-jsonc
+markdown-link-check.log
+
+# IDEs & editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.vscode/mcp.json
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# MCP & Copilot configuration files
+mcp.json
+.mcp.json
+**/mcp.json
+**/.mcp.json
+.copilot/
+.copilot
+**/.copilot/
+**/.copilot
+
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*

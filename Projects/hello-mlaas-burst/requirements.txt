@@ -1,0 +1,9 @@
+# Dependencies for Hello MLaaS Burst Reference Pipeline
+# Pinned to the versions verified together on Python 3.12 (numpy 2.5 requires >=3.12).
+# scikit-learn is pinned to the latest release but is not imported by the pipeline code.
+flytekit==1.16.29
+ray[default,data]==2.59.0
+numpy==2.5.4
+scikit-learn==1.9.1
+pandas==3.0.6
+pyarrow==26.0.0

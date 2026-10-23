@@ -1,0 +1,31 @@
+flowchart TD
+    subgraph FlyteDAG["Flyte Macro-DAG Pipeline (surrogate_pipeline)"]
+        Step1["Step 1: generate_mesh_data<br/>CPU Task (Cached)<br/>Generates airfoil mesh & CFD baseline"]
+        Step2["Step 2: train_surrogate_burst<br/>Ray Distributed Compute Task<br/>Parallel slices across Ray workers"]
+        Step3["Step 3: evaluate_surrogate<br/>CPU Task<br/>Benchmarks 72,000x speedup vs 48hr CFD"]
+        Step1 -->|Typed FlyteFile / Parquet| Step2
+        Step2 -->|Model Weights & R² Score| Step3
+    end
+
+    subgraph Target1["Target 1: Local Mac (Apple Silicon KinD)"]
+        MacKinD["KinD 4-Node Container Cluster<br/>• mlaas-control-plane<br/>• mlaas-platform-infra (Flyte Core)<br/>• mlaas-ray-head (GCS & Dashboard: 8265)<br/>• mlaas-burst-worker (Simulated GPU / MPS)"]
+    end
+
+    subgraph Target2["Target 2: AWS EKS Burstable Production"]
+        EKSFlyte["FlyteAdmin & Propeller (m6i nodes)"]
+        KubeRay["KubeRay Operator Controller"]
+        Karpenter["Karpenter Dynamic Node Provisioner"]
+        GpuNode["Ephemeral GPU Node Pool<br/>(8× H100 p5.48xlarge)<br/>Ray Workers (NCCL All-Reduce)"]
+        KubeRay --> Karpenter
+        Karpenter --> GpuNode
+    end
+
+    subgraph Target3["Target 3: On-Premises (Firewall VMs)"]
+        Registry["Air-gapped Container Registry<br/>Internal Container Images"]
+        OnPremS3["Internal MinIO Object Store"]
+        OnPremRay["Static VM Ray Cluster<br/>Pre-allocated GPU Workers"]
+    end
+
+    Step2 -.->|Local execution| MacKinD
+    Step2 -.->|Submits RayJob CRD| KubeRay
+    Step2 -.->|Connects to static ray://| OnPremRay
