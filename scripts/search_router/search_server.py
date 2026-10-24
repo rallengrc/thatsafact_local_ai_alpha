@@ -62,14 +62,23 @@ tools = MCPSearchTools(
 
 
 @mcp.tool()
-def search_workspace(query: str, limit: int = 10, curate_for_llm: bool = True, language: str = None) -> str:
-    """Search the workspace semantically and by code patterns."""
-    logger.info(f"search_workspace called: query={query}, limit={limit}")
+def search_workspace(query: str, limit: int = 10, curate_for_llm: bool = True, language: str = None, passport: str = None) -> str:
+    """Search the workspace semantically and by code patterns.
+    
+    Args:
+        query: Search query
+        limit: Maximum results
+        curate_for_llm: Whether to deduplicate and rank for LLM context
+        language: Optional language filter (python, yaml, markdown, etc.)
+        passport: Optional category passport filter ('cloud', 'ml', 'kubernetes', 'skill', 'all')
+    """
+    logger.info(f"search_workspace called: query={query}, limit={limit}, passport={passport}")
     result = tools.search_workspace(
         query=query,
         limit=limit,
         curate_for_llm=curate_for_llm,
         language=language,
+        passport=passport,
     )
     return json.dumps(result, indent=2, default=str)
 
@@ -100,23 +109,59 @@ def search_semantic(query: str, limit: int = 10, threshold: float = 0.3) -> str:
 
 
 @mcp.tool()
-def search_symbols(query: str, limit: int = 15, kind: str = None, file_filter: str = None) -> str:
-    """Search code symbols (classes, functions, methods) via Graphify AST."""
-    logger.info(f"search_symbols called: query={query}, kind={kind}")
+def search_symbols(query: str, limit: int = 15, kind: str = None, file_filter: str = None, passport: str = None) -> str:
+    """Search code symbols (classes, functions, methods) via Graphify AST.
+    
+    Args:
+        query: Symbol name, prefix, or regex
+        limit: Maximum results
+        kind: Optional symbol kind ('class', 'function', 'method')
+        file_filter: Optional file path filter
+        passport: Optional category passport filter ('cloud', 'ml', 'kubernetes', 'skill', 'all')
+    """
+    logger.info(f"search_symbols called: query={query}, kind={kind}, passport={passport}")
     result = tools.search_symbols(
         query=query,
         limit=limit,
         kind=kind,
         file_filter=file_filter,
+        passport=passport,
     )
     return json.dumps(result, indent=2, default=str)
 
 
 @mcp.tool()
-def search_everything(query: str, limit: int = 10) -> str:
-    """Broad full-text search across all workspace files using Tantivy BM25."""
-    logger.info(f"search_everything called: query={query}, limit={limit}")
+def search_everything(query: str, limit: int = 10, passport: str = None) -> str:
+    """Broad full-text search across all workspace files using Tantivy BM25.
+    
+    Args:
+        query: Full-text or boolean query
+        limit: Maximum results
+        passport: Optional category passport filter ('cloud', 'ml', 'kubernetes', 'skill', 'all')
+    """
+    logger.info(f"search_everything called: query={query}, limit={limit}, passport={passport}")
     result = tools.search_everything(
+        query=query,
+        limit=limit,
+        passport=passport,
+    )
+    return json.dumps(result, indent=2, default=str)
+
+
+@mcp.tool()
+def find_skill(query: str, limit: int = 5) -> str:
+    """Find internal agent skill on demand and return lean actionable instructions (<=100L).
+    
+    Discovers skills across .github/skills/, code/superpowers/skills/,
+    code/flyte-agent-plugins/, and code/awesome-copilot/.
+    Returns lean distilled instructions with reference path to the full file.
+    
+    Args:
+        query: Skill topic or name (e.g., 'flyte deploy aws', 'subagent driven development', 'brainstorming')
+        limit: Maximum matching candidates to check
+    """
+    logger.info(f"find_skill called: query={query}, limit={limit}")
+    result = tools.find_skill(
         query=query,
         limit=limit,
     )

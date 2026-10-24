@@ -14,7 +14,9 @@ import json
 import logging
 import sys
 import os
-from typing import Dict, List, Any, Optional, Literal
+import re
+from pathlib import Path
+from typing import Dict, List, Any, Optional, Literal, Tuple
 
 _CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 _SCRIPTS_DIR = os.path.dirname(_CURRENT_DIR)
@@ -29,6 +31,18 @@ try:
 except ImportError:
     from search_router import UnifiedSearchRouter, QueryType
     from livetext import RipgrepSearcher, SearchMatch
+
+try:
+    from .passport import PassportResolver, Passport
+    from .skill_distiller import LeanSkillDistiller
+except ImportError:
+    try:
+        from passport import PassportResolver, Passport
+        from skill_distiller import LeanSkillDistiller
+    except ImportError:
+        PassportResolver = None
+        Passport = None
+        LeanSkillDistiller = None
 
 from vectordb_provider import get_provider
 
@@ -89,6 +103,7 @@ class MCPSearchTools:
         limit: int = 10,
         curate_for_llm: bool = True,
         language: Optional[str] = None,
+        passport: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Hybrid search combining ripgrep + semantic search.
@@ -102,6 +117,7 @@ class MCPSearchTools:
             limit: Maximum results to return
             curate_for_llm: Whether to optimize results for LLM context (default True)
             language: Optional language filter (python, javascript, rust, etc.)
+            passport: Optional passport partition tag ('cloud', 'ml', 'kubernetes', 'skill', 'all')
 
         Returns:
             Dictionary with:
@@ -124,7 +140,7 @@ class MCPSearchTools:
             analysis = self.router.query_analyzer.analyze(query)
             logger.info(
                 f"Query analysis: type={analysis.query_type}, "
-                f"confidence={analysis.confidence:.2f}"
+                f"confidence={analysis.confidence:.2f}, passport={passport}"
             )
 
             # If language specified, use ripgrep with language filter
@@ -134,19 +150,36 @@ class MCPSearchTools:
                     query, file_types=file_types, limit=limit
                 )
                 results = [self._search_match_to_dict(r) for r in results]
+                if passport and PassportResolver:
+                    results = PassportResolver.filter_results(results, passport, path_attr="file")
             else:
                 # Use unified router for intelligent hybrid search
                 results = self.router.search_hybrid(
-                    query, limit=limit, curate_for_llm=curate_for_llm
+                    query, limit=limit, curate_for_llm=curate_for_llm, passport=passport
                 )
                 # Convert SearchResult objects to dicts
                 results = [r.to_dict() if hasattr(r, 'to_dict') else r for r in results]
 
-            metadata = {}
+            metadata: Dict[str, Any] = {}
+
+            # If general search ('all' / None) returns a SKILL.md, provide a non-intrusive hint
+            skill_hits = []
+            for r in results:
+                path_str = r.get("path") or r.get("file") or ""
+                if path_str.endswith("SKILL.md"):
+                    skill_name = Path(path_str).parent.name
+                    skill_hits.append({"name": skill_name, "path": path_str})
+
+            if skill_hits and not passport:
+                metadata["skill_suggestions"] = [
+                    f"Found internal skill '{s['name']}' at '{s['path']}'. Invoke find_skill('{s['name']}') to apply lean workflow."
+                    for s in skill_hits[:3]
+                ]
 
             return {
                 "status": "success",
                 "query": query,
+                "passport": passport or "all",
                 "query_type": str(analysis.query_type.value),
                 "routing_confidence": analysis.confidence,
                 "result_count": len(results),
@@ -307,20 +340,22 @@ class MCPSearchTools:
         limit: int = 15,
         kind: Optional[str] = None,
         file_filter: Optional[str] = None,
+        passport: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Search code symbols (classes, methods, functions) via Graphify AST."""
         try:
             if not query or not query.strip():
                 return {"status": "error", "message": "Query cannot be empty", "results": []}
 
-            logger.info(f"Symbol search: query={query}, kind={kind}, limit={limit}")
+            logger.info(f"Symbol search: query={query}, kind={kind}, limit={limit}, passport={passport}")
             results = self.router.search_symbols(
-                query=query, limit=limit, kind=kind, file_filter=file_filter
+                query=query, limit=limit, kind=kind, file_filter=file_filter, passport=passport
             )
             return {
                 "status": "success",
                 "query": query,
                 "kind": kind,
+                "passport": passport or "all",
                 "result_count": len(results),
                 "results": [r.to_dict() for r in results],
             }
@@ -332,21 +367,145 @@ class MCPSearchTools:
         self,
         query: str,
         limit: int = 10,
+        passport: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Broad full-text search across all workspace files using Tantivy BM25."""
         try:
             if not query or not query.strip():
                 return {"status": "error", "message": "Query cannot be empty", "results": []}
 
-            logger.info(f"Broad everything search: query={query}, limit={limit}")
-            results = self.router.search_everything(query=query, limit=limit)
+            logger.info(f"Broad everything search: query={query}, limit={limit}, passport={passport}")
+            results = self.router.search_everything(query=query, limit=limit, passport=passport)
             return {
                 "status": "success",
                 "query": query,
+                "passport": passport or "all",
                 "result_count": len(results),
                 "results": [r.to_dict() for r in results],
             }
         except Exception as e:
+            logger.error(f"Broad search error: {e}", exc_info=True)
+            return {"status": "error", "message": str(e), "results": []}
+
+    def find_skill(
+        self,
+        query: str,
+        limit: int = 5,
+        max_lines: int = 100,
+    ) -> Dict[str, Any]:
+        """Find an internal skill on-demand and distill it to Lean AI format (<=100L).
+
+        Discovers SKILL.md files across:
+          - .github/skills/
+          - code/superpowers/skills/
+          - code/flyte-agent-plugins/plugins/flyte/skills/
+          - code/awesome-copilot/skills/
+
+        Returns:
+          - Lean procedural instructions (<=100L) for immediate prompt execution
+          - Full source path reference so verbose file can be leveraged if needed
+          - Timed cache lookup (5-minute TTL) to prevent repeated prompt lag
+        """
+        try:
+            if not query or not query.strip():
+                return {"status": "error", "message": "Skill query cannot be empty"}
+
+            q_tokens = [t.lower() for t in re.split(r"[\s\-_]+", query.strip()) if t]
+            root = Path(self.workspace_root or ".").resolve()
+
+            candidate_roots = [
+                root / ".github" / "skills",
+                root / "code" / "superpowers" / "skills",
+                root / "code" / "flyte-agent-plugins" / "plugins" / "flyte" / "skills",
+                root / "code" / "awesome-copilot" / "skills",
+            ]
+
+            skill_files: List[Path] = []
+            for c_root in candidate_roots:
+                if c_root.is_dir():
+                    for p in c_root.rglob("SKILL.md"):
+                        if ".git" not in p.parts:
+                            skill_files.append(p)
+
+            stopwords = {"skill", "skills", "the", "a", "an", "for", "to", "in", "and", "or", "of"}
+            meaningful_tokens = [t for t in q_tokens if t not in stopwords]
+            search_tokens = meaningful_tokens if meaningful_tokens else q_tokens
+
+            # Score candidates
+            scored: List[Tuple[float, str, Path]] = []
+            for sp in skill_files:
+                skill_name = sp.parent.name.lower()
+                score = 0.0
+
+                # Match in skill directory name using search_tokens
+                for t in search_tokens:
+                    if t == skill_name:
+                        score += 25.0
+                    elif len(t) > 2 and t in skill_name:
+                        score += 10.0
+
+                # Read frontmatter for meaningful content tokens
+                if meaningful_tokens:
+                    try:
+                        head_sample = sp.read_text(encoding="utf-8", errors="replace")[:1500].lower()
+                        for t in meaningful_tokens:
+                            if len(t) > 2 and t in head_sample:
+                                score += 4.0
+                    except Exception:
+                        pass
+
+                # Require a meaningful threshold (not just generic matches)
+                if score >= 6.0:
+                    scored.append((score, sp.parent.name, sp))
+
+            scored.sort(key=lambda x: x[0], reverse=True)
+
+            if not scored:
+                return {
+                    "status": "not_found",
+                    "query": query,
+                    "message": f"No internal skills found matching '{query}'.",
+                    "available_skill_roots": [str(c.relative_to(root)) for c in candidate_roots if c.exists()],
+                }
+
+            best_match = scored[0]
+            best_path = str(best_match[2].resolve())
+
+            if LeanSkillDistiller:
+                distilled = LeanSkillDistiller.distill_file(best_path, max_lines=max_lines)
+            else:
+                distilled = {
+                    "skill_name": best_match[1],
+                    "source_path": best_path,
+                    "lean_markdown": best_match[2].read_text(encoding="utf-8", errors="replace")[:2000],
+                    "distilled_lines": 50,
+                    "total_raw_lines": 50,
+                    "reference_note": f"Full file at {best_path}",
+                    "cached": False,
+                }
+
+            other_matches = [
+                {"name": s[1], "path": str(s[2].relative_to(root)), "score": s[0]}
+                for s in scored[1:limit]
+            ]
+
+            return {
+                "status": "success",
+                "query": query,
+                "skill_name": distilled.get("skill_name", best_match[1]),
+                "description": distilled.get("description", ""),
+                "source_path": distilled.get("source_path", best_path),
+                "total_raw_lines": distilled.get("total_raw_lines", 0),
+                "distilled_lines": distilled.get("distilled_lines", 0),
+                "cached": distilled.get("cached", False),
+                "lean_markdown": distilled.get("lean_markdown", ""),
+                "reference_note": distilled.get("reference_note", ""),
+                "other_matches": other_matches,
+            }
+
+        except Exception as e:
+            logger.error(f"find_skill error: {e}", exc_info=True)
+            return {"status": "error", "message": str(e)}
             logger.error(f"Broad search error: {e}", exc_info=True)
             return {"status": "error", "message": str(e), "results": []}
 

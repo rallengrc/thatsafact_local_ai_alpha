@@ -21,4 +21,4 @@ applyTo: '**/*.py, **/*.ipynb'
    - Always pass `projectPath` as a valid absolute path when calling PyCharm MCP tools.
    - Ensure file paths are normalized POSIX paths (`path/to/file.py`).
 5. **Execution Tools Priority:**
-   - For running terminal commands, builds, or tests, prioritize `execution_subagent` (or `runTests`) over PyCharm terminal commands unless the user explicitly requests running a PyCharm run configuration.
+   - For running terminal commands, builds, or tests, prioritize direct tools (`bash`, `runTests`) over PyCharm terminal commands unless the user explicitly requests running a PyCharm run configuration. Never delegate to subagents.

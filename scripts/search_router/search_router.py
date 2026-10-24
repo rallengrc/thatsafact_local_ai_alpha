@@ -58,6 +58,15 @@ except ImportError:
     except ImportError:
         GraphifySearcher = None
 
+try:
+    from .passport import PassportResolver, Passport
+except ImportError:
+    try:
+        from passport import PassportResolver, Passport
+    except ImportError:
+        PassportResolver = None
+        Passport = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -531,6 +540,7 @@ class UnifiedSearchRouter:
         ripgrep_weight: float = 0.5,
         semantic_weight: float = 0.5,
         curate_for_llm: bool = False,
+        passport: Optional[str] = None,
     ) -> List[SearchResult]:
         """Hybrid search combining ripgrep + semantic (+ tantivy/graphify when appropriate).
 
@@ -609,6 +619,9 @@ class UnifiedSearchRouter:
         # Curate for LLM if requested
         if curate_for_llm:
             limited, _ = self.curator.curate(limited)
+
+        if passport and PassportResolver:
+            limited = PassportResolver.filter_results(limited, passport)
 
         return limited
 
@@ -787,6 +800,7 @@ class UnifiedSearchRouter:
         limit: int = 15,
         kind: Optional[str] = None,
         file_filter: Optional[str] = None,
+        passport: Optional[str] = None,
     ) -> List[SearchResult]:
         """Search code symbols (classes, functions, methods) via Graphify AST.
 
@@ -795,6 +809,7 @@ class UnifiedSearchRouter:
             limit: Maximum results
             kind: Optional entity kind ('class', 'function', 'method')
             file_filter: Optional file path filter
+            passport: Optional passport partition tag ('cloud', 'ml', 'kubernetes', 'skill')
 
         Returns:
             List of SearchResult objects with precise AST locations
@@ -819,23 +834,32 @@ class UnifiedSearchRouter:
                     metadata=hit.get("metadata", {}),
                 )
             )
+
+        if passport and PassportResolver:
+            results = PassportResolver.filter_results(results, passport)
+
         return results
 
     def search_everything(
         self,
         query: str,
         limit: int = 10,
+        passport: Optional[str] = None,
     ) -> List[SearchResult]:
         """Broad full-text search across all workspace and code files using Tantivy BM25.
 
         Args:
             query: Full-text or boolean query
             limit: Maximum results
+            passport: Optional passport partition tag ('cloud', 'ml', 'kubernetes', 'skill')
 
         Returns:
             List of SearchResult objects
         """
-        return self.search_tantivy(query=query, limit=limit)
+        results = self.search_tantivy(query=query, limit=limit)
+        if passport and PassportResolver:
+            results = PassportResolver.filter_results(results, passport)
+        return results
 
     def get_router_stats(self) -> Dict[str, Any]:
         """Get statistics about router and all indexed engines.

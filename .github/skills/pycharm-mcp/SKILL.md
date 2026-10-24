@@ -23,8 +23,8 @@ description: "Opportunistically leverage JetBrains PyCharm MCP server tools from
 | **Jupyter Notebooks** | `run_notebook_cell`, `read_notebook_cell`, `edit_notebook` | `runNotebookCell`, `readNotebookCellOutput`, `editNotebook` |
 | **Python Environment** | `get_python_environment`, `configure_python_interpreter` | `pylancePythonEnvironments`, `getPythonEnvironmentInfo` |
 | **Database Queries** | `execute_sql_query`, `preview_table_data` | `sqlite-read_query`, `sql` |
-| **Terminal / CLI** | `execute_terminal_command` | `execution_subagent` (preferred), `bash` |
-| **VCS / Git Status** | `git_status`, `get_repositories` | `execution_subagent` (`git status`), built-in git tools |
+| **Terminal / CLI** | `execute_terminal_command` | `bash`, native terminal tools |
+| **VCS / Git Status** | `git_status`, `get_repositories` | `bash` (`git status`), built-in git tools |
 
 ---
 

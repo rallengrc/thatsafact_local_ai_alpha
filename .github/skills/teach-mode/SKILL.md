@@ -7,85 +7,32 @@ description: 'Teach Mode — deep technical explanations with a "See Also" searc
 
 ## What Is Teach Mode?
 
-Kiss-mode says *"You have a Ferrari."* Teach mode **opens the hood** and hands you a ranked bibliography. Kiss-mode on steroids for big brain tech muscles.
+Teach mode provides **rigorous, facts-grounded technical explanations** with verified architecture traces, configuration mechanics, empirical data, and a ranked bibliography of real workspace references. Zero fluff, zero patronizing analogies.
 
 ## Mode Behavior
 
-| Activation | Scope |
-|------------|-------|
-| `teach-mode` | Session (until mode switch) |
-| `teach me X` | One-shot |
-| `kiss-mode learn/verbose` | Activates teach-mode |
-| `power-mode` / `kiss-mode` | Exits teach-mode |
+| Activation | Scope | Behavior |
+|------------|-------|----------|
+| `teach-mode` | Session | Deep technical grounding with empirical evidence and bibliography |
+| `teach me X` | One-shot | Deep dive on X with verified code references |
+| `power-mode` | — | Terse execution mode (exits teach-mode) |
 
-Decorator overlays on ANY content mode: `kiss + teach` = charm + depth; `power + teach` = terse + depth.
+## Response Structure
 
-## Context Mode Integration
+### 1. Architectural Thesis & Grounding
+Core technical reality in 1-2 precise sentences. Zero analogies, zero fluff.
 
-Teach-mode is a **communication decorator** — works with any content mode (lean, code, analysis, diamond, panic, prod). Switch decorator by saying `use teach-mode`, `use kiss-mode`, or `use power-mode`.
+### 2. How It Works (Mechanics & Plumbing)
+Under-the-hood execution trace: exact data structures, APIs, configuration keys, call flows, and runtime contracts.
 
-### Suggesting Mode Switches
-- Hands-on coding: `use code-mode` | Exploring lightly: `use lean-mode`
-- Quick answers: `use power-mode` | Requirements: `use analysis-mode`
+### 3. Operational Knobs & Optimal Conditions
+Exact configuration flags, parameters, trade-offs, and failure recovery steps.
 
-## Response Template (6 Sections)
+### 4. By The Numbers (Empirical Proof)
+Hard metrics: token counts, latency profiles, cache hits, benchmark tables, and verified telemetry.
 
-Show/hide by relevance — not all sections needed for every answer.
-
-### 1. Concierge Note (inherited from kiss-mode)
-
-```
-💎 **Concierge Note:** {one-sentence summary}
-{analogy — 2-3 sentences max, the Ferrari charm}
-**Shortcut:** {trigger} | **Applies:** {when}
-```
-
-Load `kiss-mode-concierge/SKILL.md` decoration table for analogy patterns.
-
-### 2. How It Works
-
-```
-🔧 **How It Works:**
-{Technical implementation — algorithm, code paths, data flow}
-**Code:** {file paths with method names}
-```
-
-### 3. Optimal Conditions
-
-```
-⚡ **Optimal Conditions:**
-- {When to use this vs alternatives}
-- {Configuration tips, performance characteristics}
-- {Common pitfalls and how to avoid them}
-```
-
-### 4. By The Numbers
-
-```
-📊 **By The Numbers:**
-{Metrics, counts, sizes, performance benchmarks, complexity}
-```
-
-### 5. See Also (THE KILLER FEATURE)
-
-```
-📚 **See Also:**
-🟢 `path/to/file.md` — One-line summary (high relevance)
-🟡 `path/to/file.md` — One-line summary (medium relevance)
-🔵 `path/to/file.md` — One-line summary (related)
-```
-
-Run dual search (ChromaDB + diamond-router Tantivy keyword), merge & score, max 10 items.
-
----
-
-## Section Display Rules
-
-| Question Type | Sections Shown |
-|---------------|----------------|
-| "What is X?" | Concierge + How It Works + See Also |
-| "How does X work?" | All except Deep Dive |
-| "Why does X work that way?" | All sections including Deep Dive |
-| "Teach me X" | All except Deep Dive (add if complex) |
-| Code navigation | How It Works + By The Numbers + See Also |
-| Formula/math topic | All sections, Deep Dive with LaTeX |
+### 5. Verified Bibliography (See Also)
+Ranked, verified workspace file links:
+- 🟢 High relevance (direct implementation / spec)
+- 🟡 Medium relevance (supporting subsystem)
+- 🔵 Contextual reference

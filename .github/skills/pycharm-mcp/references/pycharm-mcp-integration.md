@@ -39,21 +39,21 @@ Configured in VS Code user or workspace settings (`.vscode/mcp.json` or Copilot 
 }
 ```
 
-### SSE / HTTP Stream Transport
-When PyCharm runs as an IDE service with MCP enabled:
+### HTTP Stream Transport (Verified for PyCharm 2025.2+)
+When PyCharm runs as an IDE service with MCP enabled (`Tools > MCP Server`):
 
 ```json
 {
   "servers": {
     "pycharm": {
-      "type": "sse",
-      "url": "http://127.0.0.1:64462/sse"
+      "type": "http",
+      "url": "http://127.0.0.1:64462/stream"
     }
   }
 }
 ```
 
-*(Note: Verify the active MCP SSE port via `lsof -a -p $(pgrep -f pycharm) -iTCP -sTCP:LISTEN` or the PyCharm MCP Server Settings dialog)*
+*(Note: Use `/stream` (MCP Streamable HTTP), NOT `/sse`. The `/sse` endpoint rejects MCP client POST handshakes with HTTP 405 Method Not Allowed. Copilot CLI config: `copilot mcp add --transport http pycharm http://127.0.0.1:64462/stream`)*
 
 ---
 

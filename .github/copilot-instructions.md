@@ -64,3 +64,11 @@ All Python executions **must** use `.venv/bin/python3` or `.venv/bin/pytest`:
 3. **Line Limits:** `SKILL.md` ≤100L, references ≤150L, instructions ≤180L. (`.prompt.md` is strictly forbidden).
 4. **Facts-Only:** Never invent metrics or citations. Verify all counts live before output.
 5. **Client-Neutral Content:** No client, site, internal-system or engagement names outside `Projects/Burstable MLaaS/`; unsure who the client is → **ask, never guess**. Rules and scanner command: [client-neutral-content.instructions.md](instructions/client-neutral-content.instructions.md).
+6. **Direct Execution Default & Subagent Routing:**
+   - **Default (~80% of tasks):** Run directly in the primary session with Gemini 3.8 Flash (zero subagents).
+   - **`seq-think` keyword:** Decompose problem via sequential thinking into discrete subtasks, then execute each task with a subagent passing `model: "gemini-3.8-flash"`.
+   - **`subagent-flow` keyword:** Fast subagent dispatch without prior sequential thinking planning; all child tasks explicitly pass `model: "gemini-3.8-flash"`.
+   - **Auto-trigger:** Disparate multi-directory searches or parallel verification builds automatically trigger subagent flow (locked to Gemini 3.8 Flash). Never leave `model` empty to prevent fallback to `gpt-5.6-luna`.
+7. **Sticky Search Modes (`internal-first` / `external-first`):**
+   - **`internal-first` (Sticky):** Persists across turns once activated. Pre-routes queries through local Search Router v2 (Tantivy + Graphify + Ripgrep + ChromaDB via RRF) and injects bounded top results (≤1,500 tokens) before tool calling.
+   - **`external-first` (Sticky):** Deactivates local RRF pre-injection; returns to default direct on-demand tool execution.

@@ -65,6 +65,8 @@ DEFAULT_TARGET_DIRS = [
     "code/enhancements/reps",
     "code/unionai-docs",
     "code/awesome-copilot",
+    "code/superpowers",
+    "code/flyte-agent-plugins",
 ]
 EXCLUDE_DIRS = {".git", ".venv", ".chroma", ".tantivy", ".graphify", "__pycache__", "Archives"}
 

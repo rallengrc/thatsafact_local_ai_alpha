@@ -14,8 +14,9 @@ last_updated: "2026-10-24"
 
 1. Call `sequentialthinking` **before** reading files or running tools; set an initial `totalThoughts` (3–6) and revise as needed.
 2. Each thought builds on, questions, or revises the last. Branch when two designs compete; mark revisions.
-3. End with one hypothesis, a verification step, and a single recommendation.
-4. Pairs with `plan-first` (present the plan, wait for approval) and `give-options` (2–6 scored options).
+3. Decompose the final plan into discrete tasks.
+4. Execute each task via a subagent (`task` tool), explicitly passing `model: "gemini-3.8-flash"` (unless human specifies a different model). Never leave `model` empty.
+5. Pairs with `plan-first` (present plan, wait for approval) and `give-options` (2–6 scored options).
 
 ## Usage
 

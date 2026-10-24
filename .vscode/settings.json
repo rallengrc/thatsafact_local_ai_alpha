@@ -1,0 +1,27 @@
+{
+    "chat.subagents.defaultToAuto": false,
+    "chat.exploreAgent.defaultModel": "Gemini 3.8 Flash (copilot)",
+    "github.copilot.chat.executionSubagent.enabled": false,
+    "github.copilot.chat.executionSubagent.model": "gemini-3.8-flash",
+    "github.copilot.chat.executionSubagent.useAgenticProxy": false,
+    "github.copilot.chat.searchSubagent.enabled": false,
+    "github.copilot.chat.searchSubagent.model": "gemini-3.8-flash",
+    "github.copilot.chat.searchSubagent.useAgenticProxy": false,
+    "chat.agentHost.copilot.executionSubagent.enabled": false,
+    "github.copilot.chat.implementAgent.model": "gemini-3.8-flash",
+    "github.copilot.chat.askAgent.model": "gemini-3.8-flash",
+    "chat.tools.urls.autoApprove": {
+        "https://code.visualstudio.com": true,
+        "https://code.visualstudio.com/*": true,
+        "https://github.com/microsoft/vscode/wiki/*": true,
+        "https://ai.google.dev": true,
+        "https://ai.google.dev/*": true,
+        "https://*.google.dev": true,
+        "https://ai.google.dev/gemini-api": true,
+        "https://ai.google.dev/gemini-api/*": true,
+        "https://ai.google.dev/gemini-api/docs": true,
+        "https://ai.google.dev/gemini-api/docs/*": true,
+        "https://ai.google.dev/gemini-api/docs/api-key": true,
+        "https://ai.google.dev/gemini-api/docs/models": true
+    }
+}

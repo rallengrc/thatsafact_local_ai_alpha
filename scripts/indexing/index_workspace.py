@@ -29,6 +29,15 @@ sys.path.insert(0, os.path.dirname(__file__))
 from common_platform import ensure_venv_site_packages
 ensure_venv_site_packages()
 
+_ROUTER_DIR = os.path.join(_SCRIPTS_DIR, "search_router")
+if _ROUTER_DIR not in sys.path:
+    sys.path.insert(0, _ROUTER_DIR)
+
+try:
+    from passport import PassportResolver
+except ImportError:
+    PassportResolver = None
+
 from vectordb_provider import get_provider, VectorDBProvider
 
 logging.basicConfig(
@@ -107,6 +116,7 @@ class FileInfo:
 
     def to_doc(self) -> Dict[str, Any]:
         """Convert to document format for vectordb."""
+        passport_tag = PassportResolver.resolve_dynamic(self.relative_path, self.content) if PassportResolver else "all"
         return {
             "id": self.relative_path,
             "text": self.content,
@@ -114,6 +124,7 @@ class FileInfo:
                 "path": self.relative_path,
                 "file_type": self.path.suffix,
                 "file_size": self.file_size,
+                "passport": passport_tag,
             },
         }
 
