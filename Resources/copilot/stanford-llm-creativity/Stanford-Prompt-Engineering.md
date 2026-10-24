@@ -298,22 +298,22 @@ Copilot CLI  ← reads from ← memories/*.md  (and .github/copilot-instructions
 Claude Code  ← reads from ← memories/mlaas/MEMORY.md
 ```
 
-## Feature #4: Reusable Prompt Library
+## Feature #4: Reusable Trigger Library
 
 **Problem Solved:** Copy-pasting the same complex prompts over and over.
 
-**Solution:** `.github/prompts/*.prompt.md` files invoked via `/` command, plus keyword triggers backed by instruction/skill files.
+**Solution:** keyword triggers backed by instruction files and skills under `.github/`. Manual-only skills carry `disable-model-invocation: true` and are invoked with `/name` or their trigger word. (The legacy `.github/prompts/*.prompt.md` format is deprecated by VS Code and no longer used here.)
 
-| Prompt / Keyword | Trigger | Purpose |
+| Skill / Keyword | Trigger | Purpose |
 |--------|---------|---------|
 | `plan-first` ([plan-first.instructions.md](../../../.github/instructions/plan-first.instructions.md)) | Say "plan-first", or any bulk request (delete, 5+ files, convert/migrate/refactor, branch ops) | Present a numbered plan with risks + build-verification command, then **wait** for "do it" before executing |
 | `give options` ([give-options.instructions.md](../../../.github/instructions/give-options.instructions.md)) | Say "give options" or "sample tails"; auto-applies to debugging, architecture, and ambiguous requirements | 2-6 options with confidence probabilities; tails add low-probability alternatives (e.g., Flyte-vs-Ray-vs-Karpenter trade-offs) |
-| `/godfather-mode` (+ `/gf` alias) | `/godfather`, `/gf`, "use all your powers" | Full-depth research: sequential thinking, subagents, MCP search tools, ranked architecture options + one decisive recommendation |
+| `godfather-mode` skill ([SKILL.md](../../../.github/skills/godfather-mode/SKILL.md)) | "godfather", "use all your powers", "full force" | Full-depth research: sequential thinking, subagents, MCP search tools, ranked architecture options + one decisive recommendation |
 | `teach-mode` skill | "teach-mode", "teach me X", "kiss-mode learn" | Kiss-mode charm + deep technical explanation + "See Also" dual-engine search bibliography (e.g., how Karpenter scale-to-zero works) |
-| `/seq-think` | "seq-think", "think deep" | Short alias for the sequential-thinking MCP orchestrator |
-| `/speed-test` | "speed-test", "benchmark search" | Latency benchmarks across Tantivy, Graphify, ChromaDB, Ripgrep, Hybrid |
+| `seq-think` skill ([SKILL.md](../../../.github/skills/seq-think/SKILL.md)) | "seq-think", "think deep" | Short alias for the sequential-thinking MCP orchestrator |
+| `speed-test` skill ([SKILL.md](../../../.github/skills/speed-test/SKILL.md)) | "speed-test", "benchmark search" | Latency benchmarks across Tantivy, Graphify, ChromaDB, Ripgrep, Hybrid |
 
-**Template:** see the *Prompt Template* in the appendix below (no `_TEMPLATE.prompt.md` file exists in this workspace yet).
+**Template:** see the *Skill Template* in the appendix below.
 
 ---
 
@@ -585,13 +585,13 @@ When creating prompts for development tasks, ensure coverage of:
 | **Over-tooling** | Enabling 10 tools when 2 suffice | Only enable needed tools |
 | **No examples** | Expecting telepathy | Show 1-3 concrete examples |
 
-## Prompt Template (for .prompt.md files)
+## Skill Template (for .github/skills/<name>/SKILL.md)
 
 ```markdown
 ---
-description: "Use when: <trigger phrase>"
-agent: agent
-tools: [search, write]
+name: <name>
+description: "<one line>. TRIGGERS: '<phrase>', '<phrase>'."
+disable-model-invocation: true   # omit to let the agent auto-load on matching intent
 ---
 
 # [Task Title]

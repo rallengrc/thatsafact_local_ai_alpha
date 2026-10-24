@@ -23,7 +23,7 @@
 - **Max 2-3 commands** per response
 - **Only suggest if genuinely relevant**
 - **Fire at most once per topic domain per session**
-- **Context-adaptive:** prompts added to `.github/prompts/` auto-discovered
+- **Context-adaptive:** skills added under `.github/skills/` are auto-discovered by description
 
 ## On-Demand Instruction Suggestions
 

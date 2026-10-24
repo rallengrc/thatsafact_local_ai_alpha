@@ -132,4 +132,6 @@ grep -r "preExecutionHook\|postExecutionHook\|onGeneration\|event.*handler" .git
 
 **Enforce via:** `.github/instructions/github-authoring.instructions.md` (Rule 1)
 
-**Simple principle:** Don't hope for hooks. Build with seq-think, plan-first, and mechanical validation. All three are **guaranteed to work** because they're executed by AI, not silently ignored by Copilot.
+**Simple principle:**
+- **Don't hope for hooks:** Build with seq-think, plan-first, and mechanical validation. All three are **guaranteed to work** because they're executed by AI, not silently ignored by Copilot.
+- **No prompts (`.prompt.md`):** Do not create, suggest, or re-introduce `.github/prompts/*.prompt.md` files as an optimization or customization. Prompt files are deprecated by VS Code, lack full skill capabilities, and stop working. Always use `.github/skills/<name>/SKILL.md` (with `disable-model-invocation: true` if manual `/name` invocation is desired).

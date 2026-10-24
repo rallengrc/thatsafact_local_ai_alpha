@@ -60,7 +60,7 @@ All Python executions **must** use `.venv/bin/python3` or `.venv/bin/pytest`:
 ## 🚨 Hard Operational Gates
 
 1. **Always Use `.venv`:** Never call `python` or `pip` directly.
-2. **No Hooks:** Never use `preExecutionHook` or lifecycle hooks (they fail silently).
-3. **Line Limits:** `SKILL.md` ≤100L, references ≤150L, prompts ≤180L.
+2. **No Hooks & No Prompts:** Never use `preExecutionHook` or lifecycle hooks (they fail silently). Never create or suggest `.github/prompts/*.prompt.md` files (deprecated format that stops working; use skills with `disable-model-invocation: true` instead).
+3. **Line Limits:** `SKILL.md` ≤100L, references ≤150L, instructions ≤180L. (`.prompt.md` is strictly forbidden).
 4. **Facts-Only:** Never invent metrics or citations. Verify all counts live before output.
 5. **Client-Neutral Content:** No client, site, internal-system or engagement names outside `Projects/Burstable MLaaS/`; unsure who the client is → **ask, never guess**. Rules and scanner command: [client-neutral-content.instructions.md](instructions/client-neutral-content.instructions.md).
